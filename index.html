@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+	<title>ADA - Predicting The Present with Google Trends</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper" class="divided">
+
+		<!-- One -->
+		<section class="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
+			<div class="content">
+				<h1>Predicting Hotel Arrivals in Switzerland using Google Trends</h1>
+				<p class="major">The project goal is to show how google trends can improve the predictions of a model initialy based on features monthly released. The idea is to point out how more recent datasets in time can be useful in better predicting near-future events; especially unusual events such as crisis. During our project, we will try to answer the following questions:</p>
+				<ul style="list-style-type:disc">
+					<li><a href="#dataset">What does the DataSet look like?</a></li>
+					<li><a href="#Hotel">Which google trends are useful in predicting hotel arrivals in Switzerland?</a></li>
+					<li><a href="#web">Is it possible find better Trends using web scraping?</a></li>
+					<li><a href="#covid">Is it possible to improve the modelisation furthermore, by using Covid19 related Trends?</a></li>
+
+				</ul>
+				<ul class="actions stacked">
+					<li><a href="https://github.com/ClementEPFL/ADA_Project/blob/main/Project.ipynb" class="button big wide smooth-scroll-middle">See the code</a></li>
+				</ul>
+			</div>
+			<div class="image">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Fairmont_Le_Montreux-Palace.jpg" alt="" />
+			</div>
+		</section>
+<!-- Five -->
+		<section id="dataset" class="wrapper style1 align-center" style="background-color:white">
+			<div class="inner">
+				<h1>Exploring the DataSet</h1>
+				<p class="align-left">The dataset that is used in our study is from the Swiss Federal Office of Statistics (SFOS). The dataset contains official monthly released information about arrivals in Switzerland hotels from January 2009 to December 2020.</p>
+			</div>
+
+		</section>
+
+		<!-- Three -->
+		<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" style="background-color:white">
+			<div class="content">
+				<h3>From which countries Switzerland hotel visitors originate from?</h3>
+				<p>Here are the Top 10 arrivals in Switzerland hotels per country during the year 2018. It is observed that most of the arrivals from Europe come from neigboring countries. Regarding the rest of the world, the most arrivals originate from: the United States of America, China, South Korea and India. This gives a good indicator on where (which country) and in which language the Google Trends must be chosen. However, it is notable to obsevre that China must be discarded as Google is not used in this country</p>
+		
+			</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%; " src="images/Top_10_Arrivals_2018.png" alt="" />
+			</div>
+		</section>
+<!-- Four -->
+		<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" style="background-color:white">
+			<div class="content">
+				<h3>How did the arrivals behaved during the covid crisis period?</h3>
+				<p>In the following plot is presented the monthly number of arrivals from 2018 to 2020, during the covid 19 crisis period, in Germany. It is clear that the arrivals drasticly decrease in 2020 during the months of March, April and May. Moreover, as Germany is a neighbor country of Switzerland, it highlights even more the scale of the crisis.</p>
+			
+			</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%" src="images/Germany_Arrivals_Covid_Period.png" alt="" />
+			</div>
+		</section>
+
+
+		<!-- Four -->
+		<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+			<div class="content" align="justify">
+				<h3>To sum-up, let's visualize the difference between 2018 and 2020</h3>
+				<p>To visualize more clearly the difference between year 2020 and 2018, here are two maps representing the countries of arrivals in Switzerland accross the word We observe in these maps the contrast between the covid crisis period in 2020 and the arrivals in a 'normal' year; 2018 in that case. Indeed, asian countries are totaly absent of the 2020 map representaton.</p>
+				
+			</div>
+			<object style="width:50%; margin:20px" type="text/html" data="data/map2020.html"></object>
+			<object style="width:50%; margin:20px" type="text/html" data="data/map2018.html"></object>
+		</section>
+
+		<!-- Five -->
+		<section id="Hoteltrends" class="wrapper style1 align-center" style="background-color:white">
+			<div class="inner">
+				<h1>Baseline model and Google Trends</h1>
+				<p class="align-left">The baseline model that we use to predict the arrivals is a simple Auto-Regressive model of order 2. To select the lags (features) that interest us, we use a PACF plot (plotted bellow). </p>
+			</div>
+
+		</section>
+
+		<!-- Three -->
+		<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" style="background-color:white">
+			<div class="content">
+				<h3>How to select the lags of our base model?</h3>
+			<p>From the partial autocorrelation function(which instead of finding correlations of present with lags like ACF, finds correlation of the residuals which remains after removing the effects which are already explained by the earlier lags) with the next lag value some lags that have a big autocorrelation coefficient are selected.
+The best lags are selected for the base model (without including the Google trends). The idea is to find the best two lags in order to have a base model that fit well the true data wothout overfitting (that's why only two lags are selected). 
+</p>
+				<p>
+To do so, the mean absolute error (MAE) between the model predictions and the true data of all the different models (which have different lags) are compared during three periods : the testing set without the crisis (from 2015/3/1 to 2020/2/1); the crisis only (.from 2020/2/1 to 2020/10/1); the whole testing set(2015/3/1 to 2020/10/1).
+Ideally this model will be further improved by adding the Google trends.
+To have an idea of how an autoregressive model behave, an AR model with only one lag is first evaluated, firstly with *t-1* and then with *t-12*. This gives an idea about the influence of these two lags.
+			</p>
+				
+			</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%; " src="parcf.png" alt="" />
+			</div>
+		</section>
+
+		<!-- Four -->
+		<section id="#Hotel" class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" style="background-color:white">
+			<div class="content">
+				<h3>Which google trends are useful in predicting hotel arrivals in Switzerland?</h3>
+				<p>An analysis on the Trends showed that the most interesting Trends are :<p>
+				
+<p class="align-left"- Hotel</p>
+<p class="align-left"- Travel\Touristic Destination\Switzerland</p>
+<p class="align-left"- Ski in Switzerland</p>
+
+<p>The three best trends were selected based on their p-values. A feature is considered good (i.e. worth using in the model) if it has a low p-value. Indeed, a low p-value means that it has low chances to happen under the null hypothesis. Here, the null Hypothesis would be "the Trends data is not an indicator of the number of hotel nights sold".</p>
+
+				
+			</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%" src="images/Trends_1.png" alt="" />
+			</div>
+		</section>
+
+		
+		<!-- Four -->
+		<section id="#web" class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+			<div class="content">
+				<h2>Is it possible to find better trends using web-scraping ?</h2>
+				<p>Before using Trends to improve the model, the right question to ask is : what trends keywords should be used ?
+Trends should reflect what people are interested in before coming to Switzerland for a touristic purpose. Thus, articles about tourism are scraped from the web.
+In information retrieval, TFIDF, short for term frequency–inverse document frequency, is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. This method was used to produce a list of trends keywords. 
+					</p>
+						<p>
+					This list of keywords served as a proposition to choose the right features.
+
+A list of relevant keywords is chosen following some tests. To get the Google Trends by country more relevantly we translate them into respective majority language. Some keywords are relevant rather in some countries than others. Summing these Trends and plotting them allows us to follow the interest in swiss tourism through the years.
+</p>
+			</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%" src="images/Hotel.png" alt="" />
+			</div>
+		</section>
+
+
+		<!-- Four -->
+		<section id="#covid" class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+			<div class="content" align="justify">
+				<h3>Is it possible to use covid-related Trends ?</h3>
+				<p>Trends related to hotel reservation improved the quality of the model and thus build a strong long-term model to predict hotel-stays in Switzerland. However, in the context of the corona crisis, it might be useful to include covid-related trends.
+
+Feature engineering techniques showed that the most significant keyword is simply ‘covid19’. However, after including it to the model, the MAE improvement was 28% compared to the base model. Compared to the 28% improvement with only hotel-related Trends, this does not bring any improvement.
+</p>
+	<p>
+It can be explained by two main reasons :
+The ‘covid19’ interest rose in a violent spike going from minimum to maximum in the span of two month. This sharp change does not bring much valuable information compared to the long-term tendency of hotel-trends
+Covid is a new trend and there are only a few months to train on. There is a lack of data
+
+This project must lead to answers to these questions
+Which google trends are useful in predicting hotel arrivals in Switzerland ?
+Will google trends make more accurate predictions in the context of the COVID-19 crisis than the official statistics of the Switzerland Federal Office of Statistics (which are monthly released)?
+</p>
+				</div>
+			<div style="width:85%; margin:20px;" class="barchart">
+				<img style="width:100%" src="images/covid.png" alt="" />
+			</div>
+				
+		</section>
+
+		
+
+
+		<section id="sugar" class="wrapper style1 align-center" style="background-color:white">
+			<div class="inner">
+				<h3>Conclusion</h3>
+				<p class="align-left">In conclusion, the prediction of hotel arrivals can be greatly improved with the inclusion of Google Trends data. The choice of keywords is crucial to the performance of these predictions. Many selection methods are available. The use of web scraping and TFIDF allows us to reveal intuitive and insightful keywords. Using a simple auto-regression prediction method, we obtained powerful results of 28% improvement in comparison with the base model.</p>
+			</div>
+
+		</section>
+
+
+		<!-- Footer -->
+		<footer class="wrapper style1 align-center">
+			<div class="inner">
+				<p>&copy; Toursim Data</p>
+			</div>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
